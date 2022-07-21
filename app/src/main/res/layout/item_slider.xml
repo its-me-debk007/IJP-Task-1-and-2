@@ -4,14 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.google.android.material.button.MaterialButton
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/minValue"
-        style="@style/sliderValuesStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="48dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="1"
+        android:drawablePadding="24dp"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,19 +21,23 @@
         android:id="@+id/slider"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:stepSize="1"
+        app:labelBehavior="gone"
         app:layout_constraintBottom_toBottomOf="@+id/minValue"
         app:layout_constraintEnd_toStartOf="@+id/maxValue"
         app:layout_constraintStart_toEndOf="@+id/minValue"
         app:layout_constraintTop_toTopOf="@+id/minValue" />
 
-    <com.google.android.material.button.MaterialButton
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/maxValue"
-        style="@style/sliderValuesStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="100"
+        android:drawablePadding="24dp"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
