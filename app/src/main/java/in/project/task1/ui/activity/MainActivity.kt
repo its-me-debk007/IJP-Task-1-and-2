@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), SliderInterface {
 			return
 		}
 
-		if (slider.valueTo - slider.value <= 2) {
+		if (slider.valueTo - slider.value <= 2 || slider.value - slider.valueFrom < 2) {
 			toast.cancel()
 			toast = Toast.makeText(this, "Minimum segment length is 2!", Toast.LENGTH_SHORT)
 			toast.show()
