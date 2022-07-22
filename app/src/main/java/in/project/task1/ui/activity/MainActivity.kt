@@ -5,19 +5,27 @@ import `in`.project.task1.adapter.SliderInterface
 import `in`.project.task1.adapter.SliderRecyclerAdapter
 import `in`.project.task1.databinding.ActivityMainBinding
 import `in`.project.task1.model.SliderValues
+import `in`.project.task1.util.SliderApplication
 import `in`.project.task1.viewModel.SliderViewModel
+import `in`.project.task1.viewModelFactory.SliderViewModelFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.slider.Slider
 import com.google.android.material.textview.MaterialTextView
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), SliderInterface {
-	private val viewModel by lazy { ViewModelProvider(this)[SliderViewModel::class.java] }
+	private val viewModel by lazy {
+		ViewModelProvider(this,
+						  SliderViewModelFactory((application as SliderApplication).repository)
+		)[SliderViewModel::class.java]
+	}
 	private lateinit var toast: Toast
-	private val adapter by lazy { SliderRecyclerAdapter(this, viewModel.sliderValuesList) }
+	private lateinit var adapter: SliderRecyclerAdapter
 	private lateinit var binding: ActivityMainBinding
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +33,14 @@ class MainActivity : AppCompatActivity(), SliderInterface {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 		toast = Toast.makeText(this, null, Toast.LENGTH_SHORT)
-		binding.sliderRecyclerView.adapter = adapter
+		viewModel.getSliders().observe(this) {
+			if (it.isNotEmpty()) viewModel.sliderValuesList = it.toMutableList()
+			else lifecycleScope.launch {
+				viewModel.insertSliders(viewModel.sliderValuesList)
+			}
+			adapter = SliderRecyclerAdapter(this@MainActivity, viewModel.sliderValuesList)
+			binding.sliderRecyclerView.adapter = adapter
+		}
 	}
 
 	override fun onSliderStart(minValue: MaterialTextView, position: Int) {
@@ -50,6 +65,7 @@ class MainActivity : AppCompatActivity(), SliderInterface {
 				viewModel.sliderValuesList.removeAt(position)
 			}
 			adapter.setSliders(viewModel.sliderValuesList)
+			viewModel.isDataChanged = true
 			return
 		}
 
@@ -67,6 +83,7 @@ class MainActivity : AppCompatActivity(), SliderInterface {
 																  slider.valueTo.toInt(), color))
 		adapter.setSliders(viewModel.sliderValuesList)
 		slider.valueTo = slider.value
+		viewModel.isDataChanged = true
 	}
 
 	override fun onSliderChange(slider: Slider, maxValue: MaterialTextView, position: Int) {
@@ -84,5 +101,11 @@ class MainActivity : AppCompatActivity(), SliderInterface {
 	override fun onPause() {
 		super.onPause()
 		toast.cancel()
+		if (viewModel.isDataChanged) {
+			lifecycleScope.launch {
+				viewModel.clearAllSlides()
+				viewModel.insertSliders(viewModel.sliderValuesList)
+			}
+		}
 	}
 }
